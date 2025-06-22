@@ -1,0 +1,27 @@
+# Core data science libraries
+numpy
+pandas
+scikit-learn
+
+# Plotting and visualization
+matplotlib
+seaborn
+
+# Deep Learning frameworks (choose one or both)
+tensorflow
+torch
+
+# Jupyter environment
+jupyterlab
+
+# Space science data analysis
+spacepy
+cdflib
+
+# XAI libraries
+shap
+lime
+
+# API framework (for deployment)
+fastapi
+uvicorn
