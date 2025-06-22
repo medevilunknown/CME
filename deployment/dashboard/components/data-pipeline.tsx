@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Database, Filter, TrendingUp, CheckCircle, AlertCircle, Download, Upload, Settings, AlertTriangle } from "lucide-react"
+import { Database, Filter, TrendingUp, CheckCircle, AlertCircle, Download, Upload, Settings, AlertTriangle, Cpu, HardDrive, Zap } from "lucide-react"
 import { fetchDataMetrics, fetchPipelineSteps, DataMetrics, PipelineStep } from "@/lib/api"
 
 export default function DataPipeline() {
@@ -42,208 +42,260 @@ export default function DataPipeline() {
     return () => clearInterval(interval)
   }, [])
 
+  const getStepIcon = (stepId: string) => {
+    switch (stepId) {
+      case 'ingestion': return Download
+      case 'cleaning': return Filter
+      case 'preprocessing': return Cpu
+      case 'storage': return HardDrive
+      default: return Database
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Error Alert */}
       {error && (
-        <Alert className="border-red-500/50 bg-red-500/10">
+        <Alert className="border-red-500/50 bg-red-500/10 backdrop-blur-sm">
           <AlertTriangle className="h-4 w-4 text-red-400" />
-          <AlertDescription>
+          <AlertDescription className="text-red-200">
             {error} - Please ensure the API server is running
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Pipeline Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardContent className="p-4">
+      {/* Enhanced Pipeline Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-400">Total Volume</p>
-                <p className="text-xl font-bold text-blue-400">
+                <p className="text-sm text-slate-400 mb-1">Total Volume</p>
+                <p className="text-2xl font-bold text-blue-400 group-hover:scale-105 transition-transform">
                   {loading ? "..." : dataMetrics?.totalVolume}
                 </p>
+                <p className="text-xs text-blue-300/70 mt-1">Processed data</p>
               </div>
-              <Database className="h-6 w-6 text-blue-400" />
+              <Database className="h-8 w-8 text-blue-400 group-hover:animate-pulse" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardContent className="p-4">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-400">Daily Ingestion</p>
-                <p className="text-xl font-bold text-green-400">
+                <p className="text-sm text-slate-400 mb-1">Daily Ingestion</p>
+                <p className="text-2xl font-bold text-green-400 group-hover:scale-105 transition-transform">
                   {loading ? "..." : dataMetrics?.dailyIngestion}
                 </p>
+                <p className="text-xs text-green-300/70 mt-1">Average rate</p>
               </div>
-              <TrendingUp className="h-6 w-6 text-green-400" />
+              <TrendingUp className="h-8 w-8 text-green-400 group-hover:animate-pulse" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardContent className="p-4">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-400">Quality Score</p>
-                <p className="text-xl font-bold text-purple-400">
+                <p className="text-sm text-slate-400 mb-1">Quality Score</p>
+                <p className="text-2xl font-bold text-purple-400 group-hover:scale-105 transition-transform">
                   {loading ? "..." : dataMetrics?.qualityScore.toFixed(1) + "%"}
                 </p>
+                <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2">
+                  <div 
+                    className="bg-purple-400 h-1 rounded-full transition-all duration-1000"
+                    style={{ width: `${dataMetrics?.qualityScore || 0}%` }}
+                  ></div>
+                </div>
               </div>
-              <CheckCircle className="h-6 w-6 text-purple-400" />
+              <CheckCircle className="h-8 w-8 text-purple-400 group-hover:animate-pulse" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardContent className="p-4">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-400">Missing Data</p>
-                <p className="text-xl font-bold text-orange-400">
+                <p className="text-sm text-slate-400 mb-1">Missing Data</p>
+                <p className="text-2xl font-bold text-orange-400 group-hover:scale-105 transition-transform">
                   {loading ? "..." : dataMetrics?.missingDataRate.toFixed(1) + "%"}
                 </p>
+                <div className="w-full bg-slate-700/50 rounded-full h-1 mt-2">
+                  <div 
+                    className="bg-orange-400 h-1 rounded-full transition-all duration-1000"
+                    style={{ width: `${dataMetrics?.missingDataRate || 0}%` }}
+                  ></div>
+                </div>
               </div>
-              <AlertCircle className="h-6 w-6 text-orange-400" />
+              <AlertCircle className="h-8 w-8 text-orange-400 group-hover:animate-pulse" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Pipeline Steps */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      {/* Enhanced Pipeline Steps */}
+      <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Data Processing Pipeline</CardTitle>
+          <CardTitle className="text-xl">Data Processing Pipeline</CardTitle>
           <CardDescription>Real-time processing of SWIS-ASPEX particle data from Aditya-L1</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {loading ? (
               <div className="text-center py-8 text-slate-400">Loading pipeline data...</div>
             ) : (
-              pipelineSteps.map((step) => {
-                const Icon = step.icon || Database
-              return (
-                <div key={step.id} className="flex items-center gap-4 p-4 rounded-lg bg-slate-700/30">
-                  <Icon
-                    className={`h-6 w-6 ${
-                      step.status === "completed"
-                        ? "text-green-400"
-                        : step.status === "running"
-                          ? "text-blue-400"
-                          : "text-slate-400"
-                    }`}
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{step.name}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-slate-400">{step.throughput}</span>
-                        <Badge variant={step.status === "completed" ? "default" : "secondary"}>{step.status}</Badge>
+              pipelineSteps.map((step, index) => {
+                const Icon = getStepIcon(step.id)
+                return (
+                  <div key={step.id} className="relative">
+                    <div className="flex items-center gap-6 p-6 rounded-xl bg-slate-700/30 hover:bg-slate-700/50 transition-all duration-300 border border-slate-600/50">
+                      <div className="relative">
+                        <Icon
+                          className={`h-8 w-8 ${
+                            step.status === "completed"
+                              ? "text-green-400"
+                              : step.status === "running"
+                                ? "text-blue-400"
+                                : "text-slate-400"
+                          }`}
+                        />
+                        {step.status === "running" && (
+                          <div className="absolute -inset-2 bg-blue-400/20 rounded-full animate-ping"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-lg">{step.name}</h3>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm text-slate-400 font-mono">{step.throughput}</span>
+                            <Badge 
+                              variant={step.status === "completed" ? "default" : "secondary"}
+                              className={
+                                step.status === "completed"
+                                  ? "bg-green-500/20 text-green-300 border-green-500/50"
+                                  : step.status === "running"
+                                    ? "bg-blue-500/20 text-blue-300 border-blue-500/50"
+                                    : ""
+                              }
+                            >
+                              {step.status}
+                            </Badge>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-400 mb-3">{step.description}</p>
+                        <div className="space-y-2">
+                          <Progress value={step.progress} className="h-3" />
+                          <p className="text-xs text-slate-500">{step.progress}% complete</p>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-400 mb-2">{step.description}</p>
-                    <Progress value={step.progress} className="h-2" />
+                    {index < pipelineSteps.length - 1 && (
+                      <div className="absolute left-10 top-full w-0.5 h-6 bg-slate-600"></div>
+                    )}
                   </div>
-                </div>
-              )
+                )
               })
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Data Sources */}
+      {/* Enhanced Data Sources */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>SWIS Data Streams</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-orange-400" />
+              SWIS Data Streams
+            </CardTitle>
             <CardDescription>Solar Wind Ion Spectrometer</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Proton Density</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Alpha Particle Flux</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Velocity Vectors</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Temperature</span>
-                <Badge variant="outline" className="bg-yellow-500/20 text-yellow-300">
-                  Intermittent
-                </Badge>
-              </div>
+            <div className="space-y-4">
+              {[
+                { name: "Proton Density", status: "active" },
+                { name: "Alpha Particle Flux", status: "active" },
+                { name: "Velocity Vectors", status: "active" },
+                { name: "Temperature", status: "intermittent" }
+              ].map((stream, index) => (
+                <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-slate-700/30">
+                  <span className="text-sm font-medium">{stream.name}</span>
+                  <Badge 
+                    variant="outline" 
+                    className={
+                      stream.status === "active"
+                        ? "bg-green-500/20 text-green-300 border-green-500/50"
+                        : "bg-yellow-500/20 text-yellow-300 border-yellow-500/50"
+                    }
+                  >
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      stream.status === "active" ? "bg-green-400 animate-pulse" : "bg-yellow-400"
+                    }`}></div>
+                    {stream.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>STEPS Data Streams</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-blue-400" />
+              STEPS Data Streams
+            </CardTitle>
             <CardDescription>Supra Thermal & Energetic Particle Spectrometer</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Energetic Protons</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Energetic Electrons</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Heavy Ions</span>
-                <Badge variant="outline" className="bg-yellow-500/20 text-yellow-300">
-                  Intermittent
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Directional Flux</span>
-                <Badge variant="outline" className="bg-green-500/20 text-green-300">
-                  Active
-                </Badge>
-              </div>
+            <div className="space-y-4">
+              {[
+                { name: "Energetic Protons", status: "active" },
+                { name: "Energetic Electrons", status: "active" },
+                { name: "Heavy Ions", status: "intermittent" },
+                { name: "Directional Flux", status: "active" }
+              ].map((stream, index) => (
+                <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-slate-700/30">
+                  <span className="text-sm font-medium">{stream.name}</span>
+                  <Badge 
+                    variant="outline" 
+                    className={
+                      stream.status === "active"
+                        ? "bg-green-500/20 text-green-300 border-green-500/50"
+                        : "bg-yellow-500/20 text-yellow-300 border-yellow-500/50"
+                    }
+                  >
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      stream.status === "active" ? "bg-green-400 animate-pulse" : "bg-yellow-400"
+                    }`}></div>
+                    {stream.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Control Panel */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      {/* Enhanced Control Panel */}
+      <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Pipeline Controls</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button variant="outline" className="bg-green-500/20 text-green-300 border-green-500">
+            <Button variant="outline" className="bg-green-500/20 text-green-300 border-green-500/50 hover:bg-green-500/30">
               <Upload className="h-4 w-4 mr-2" />
               Start Ingestion
             </Button>
-            <Button variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500">
+            <Button variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500/50 hover:bg-orange-500/30">
               Pause Pipeline
             </Button>
-            <Button variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500">
+            <Button variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/50 hover:bg-blue-500/30">
               <Settings className="h-4 w-4 mr-2" />
               Configure
             </Button>
